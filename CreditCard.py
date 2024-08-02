@@ -52,18 +52,71 @@ class CreditCard:
             return False
         else:
             self._balance -= amount
-            return self._balance
+            return True
             
+    
+    
+class PerdatoryCreditCard(CreditCard):
+    ''' Inherit the CreditCard clas features'''
+    
+    def __init__(self,customer , bank , acnt , limit , apr):
         
-cc = CreditCard('Sai Krishna' , '1st bank' , '5301 1234 2345' , 1000)
-account = cc.get_account()
-cust= cc.get_customer()
-limt= cc.get_limit()
-bal = cc.get_balance()
+        super().__init__(customer , bank  , acnt , limit)  # call super constructor
+        self._apr = apr
+    
+    def charge(self , price):
+        ''' Return True if limit and card is processed
+            Return False charge $5 if denied the limit is overflow
+        '''
+        success = super().charge(price)
+        if not success:
+            self._balance += 5
+        return success
 
-bal = cc.charge(500)
-bal = cc.charge(300)
-print(f' account: {account}\n cust: {cust}\n limt: {limt}\n bal: {bal}\n')
-curr_bal = cc.make_payment(500)
-curr_bal = cc.make_payment(300)
-print(f' account: {account}\n cust: {cust}\n limt: {limt}\n bal: {bal}\n current_balance:{curr_bal}')
+    def process_month(self):
+        '''Access the montly intrest rate on outstanding balance'''
+        
+        if self._balance >0 :
+            montly_factor = pow(1+self._apr, 1/12)
+            self._balance = self._balance * montly_factor
+    
+    
+        
+
+credit_card = CreditCard('Sai Krishna', 'SBI', '5301 1234 2345', 1000)
+print("Customer:", credit_card.get_customer())
+print("Bank:", credit_card.get_bank())
+print("Account:", credit_card.get_account())
+print("Limit:", credit_card.get_limit())
+print("Balance:", credit_card.get_balance())
+
+# Perform some transactions
+print("\nCharging $200 to the credit card...")
+credit_card.charge(200)
+print("Balance after charging $200:", credit_card.get_balance())
+
+print("\nMaking a payment of $100...")
+credit_card.make_payment(100)
+print("Balance after payment of $100:", credit_card.get_balance())
+
+predatory_credit_card = PerdatoryCreditCard('Sai Krishna', 'SBI', '5301 1234 2346', 1000, 0.12)
+print("\nCustomer:", predatory_credit_card.get_customer())
+print("Bank:", predatory_credit_card.get_bank())
+print("Account:", predatory_credit_card.get_account())
+print("Limit:", predatory_credit_card.get_limit())
+print("Balance:", predatory_credit_card.get_balance())
+
+# Perform some transactions
+print("\nCharging $1200 to the predatory credit card...")
+result, balance = predatory_credit_card.charge(1200)
+print("Charge result:", result)
+print("Balance after charging $1200:", balance)
+
+print("\nCharging $500 to the predatory credit card...")
+result, balance = predatory_credit_card.charge(500)
+print("Charge result:", result)
+print("Balance after charging $500:", balance)
+
+print("\nProcessing monthly interest...")
+predatory_credit_card.process_month()
+print("Balance after processing monthly interest:", predatory_credit_card.get_balance())
